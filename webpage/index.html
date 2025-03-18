@@ -147,7 +147,7 @@
 </head>
 <body>
     <div id="game-container">
-        <h1 id="word-display">APPLE</h1>
+        <h1 id="word-display"></h1>
         <div id="images-container">
             <!-- Images will be populated by JavaScript -->
         </div>
@@ -161,31 +161,20 @@
     <script>
         // Game data - replace image paths with your actual image files
         const gameData = [
-            {
-                word: "APFEL",
-                correctImage: "assets/apple.jpg",
-                otherImages: ["assets/banana.jpg", "assets/car.jpg"]
-            },
-            {
-                word: "HUND",
-                correctImage: "assets/dog.jpg",
-                otherImages: ["assets/cat.jpg", "assets/bird.jpg"]
-            },
-            {
-                word: "BALL",
-                correctImage: "assets/ball.jpg",
-                otherImages: ["assets/book.jpg", "assets/shoe.jpg"]
-            },
-            {
-                word: "HAUS",
-                correctImage: "assets/house.jpg",
-                otherImages: ["assets/tree.jpg", "assets/car.jpg"]
-            },
-            {
-                word: "STERN",
-                correctImage: "assets/star.jpg",
-                otherImages: ["assets/moon.jpg", "assets/sun.jpg"]
-            }
+            { word: "APFEL", translation: "Apple", correctImage: "assets/apple.jpg" },
+            { word: "HUND", translation: "Dog", correctImage: "assets/dog.jpg" },
+            { word: "BALL", translation: "Ball", correctImage: "assets/ball.jpg" },
+            { word: "HAUS", translation: "House", correctImage: "assets/house.jpg" },
+            { word: "STERN", translation: "Star", correctImage: "assets/star.jpg" },
+            { word: "BANANE", translation: "Banana", correctImage: "assets/banana.jpg" },
+            { word: "AUTO", translation: "Car", correctImage: "assets/car.jpg" },
+            { word: "KATZE", translation: "Cat", correctImage: "assets/cat.jpg" },
+            { word: "VOGEL", translation: "Bird", correctImage: "assets/bird.jpg" },
+            { word: "BUCH", translation: "Book", correctImage: "assets/book.jpg" },
+            { word: "SCHUH", translation: "Shoe", correctImage: "assets/shoe.jpg" },
+            { word: "MOND", translation: "Moon", correctImage: "assets/moon.jpg" },
+            { word: "SONNE", translation: "Sun", correctImage: "assets/sun.jpg" },
+            { word: "BAUM", translation: "Tree", correctImage: "assets/tree.jpg" }
         ];
 
         // Game elements
@@ -208,6 +197,13 @@
             return array;
         }
 
+        // Function to get random images (excluding the correct image)
+        function getRandomImages(correctImage, numImages) {
+            const filteredImages = gameData.map(item => item.correctImage).filter(image => image !== correctImage);
+            const shuffledImages = shuffleArray([...filteredImages]);
+            return shuffledImages.slice(0, numImages);
+        }
+
         // Set up the current round
         function setupRound() {
             if (currentRound >= gameData.length) {
@@ -221,9 +217,12 @@
             // Clear previous images
             imagesContainer.innerHTML = '';
             
+            // Get random images
+            const otherImages = getRandomImages(roundData.correctImage, 2);
+            
             // Create array with all images and shuffle it
-            const allImages = [roundData.correctImage, ...roundData.otherImages];
-            const shuffledImages = shuffleArray([...allImages]);
+            const allImagesForRound = [roundData.correctImage, ...otherImages];
+            const shuffledImages = shuffleArray([...allImagesForRound]);
             
             // Create image elements
             shuffledImages.forEach(imageSrc => {
