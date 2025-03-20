@@ -174,7 +174,34 @@
             { word: "SCHUH", translation: "Shoe", correctImage: "assets/shoe.jpg" },
             { word: "MOND", translation: "Moon", correctImage: "assets/moon.jpg" },
             { word: "SONNE", translation: "Sun", correctImage: "assets/sun.jpg" },
-            { word: "BAUM", translation: "Tree", correctImage: "assets/tree.jpg" }
+            { word: "BAUM", translation: "Tree", correctImage: "assets/tree.jpg" },
+            { word: "BLUME", translation: "Flower", correctImage: "assets/flower.jpg" },
+            { word: "FISCH", translation: "Fish", correctImage: "assets/fish.jpg" },
+            { word: "ZUG", translation: "Train", correctImage: "assets/train.jpg" },
+            { word: "FAHRRAD", translation: "Bicycle", correctImage: "assets/bicycle.jpg" },
+            { word: "UHR", translation: "Clock", correctImage: "assets/clock.jpg" },
+            { word: "COMPUTER", translation: "Computer", correctImage: "assets/computer.jpg" },
+            { word: "TELEFON", translation: "Telephone", correctImage: "assets/telephone.jpg" },
+            { word: "TISCH", translation: "Table", correctImage: "assets/table.jpg" },
+            { word: "STUHL", translation: "Chair", correctImage: "assets/chair.jpg" },
+            { word: "FENSTER", translation: "Window", correctImage: "assets/window.jpg" },
+            { word: "TÜR", translation: "Door", correctImage: "assets/door.jpg" },
+            { word: "GARTEN", translation: "Garden", correctImage: "assets/garden.jpg" },
+            { word: "WOLKE", translation: "Cloud", correctImage: "assets/cloud.jpg" },
+            { word: "REGEN", translation: "Rain", correctImage: "assets/rain.jpg" },
+            { word: "SCHMETTERLING", translation: "Butterfly", correctImage: "assets/butterfly.jpg" },
+            { word: "EIS", translation: "Ice Cream", correctImage: "assets/icecream.jpg" },
+            { word: "WASSER", translation: "Water", correctImage: "assets/water.jpg" },
+            { word: "FEUER", translation: "Fire", correctImage: "assets/fire.jpg" },
+            { word: "MUSIK", translation: "Music", correctImage: "assets/music.jpg" },
+            { word: "BRILLE", translation: "Glasses", correctImage: "assets/glasses.jpg" },
+            { word: "LAMPE", translation: "Lamp", correctImage: "assets/lamp.jpg" },
+            { word: "GELB", translation: "Yellow", correctImage: "assets/yellow.jpg" },
+            { word: "GRÜN", translation: "Green", correctImage: "assets/green.jpg" },
+            { word: "ROT", translation: "Red", correctImage: "assets/red.jpg" },
+            { word: "BLAU", translation: "Blue", correctImage: "assets/blue.jpg" },
+            { word: "SCHWARZ", translation: "Black", correctImage: "assets/black.jpg" },
+            { word: "WEISS", translation: "White", correctImage: "assets/white.jpg" }
         ];
 
         // Game elements
@@ -206,12 +233,10 @@
 
         // Set up the current round
         function setupRound() {
-            if (currentRound >= gameData.length) {
-                // Game completed - restart
-                currentRound = 0;
-            }
-
-            const roundData = gameData[currentRound];
+            // Instead of using currentRound as an index, pick a random word
+            const randomIndex = Math.floor(Math.random() * gameData.length);
+            const roundData = gameData[randomIndex];
+            
             wordDisplay.textContent = roundData.word;
             
             // Clear previous images
@@ -234,10 +259,10 @@
                 img.alt = "Choice image";
                 
                 imageDiv.appendChild(img);
-                imageDiv.addEventListener('click', () => checkAnswer(imageSrc));
+                imageDiv.addEventListener('click', () => checkAnswer(imageSrc, randomIndex));
                 imagesContainer.appendChild(imageDiv);
             });
-
+        
             // Reset UI
             feedback.style.visibility = 'hidden';
             nextButton.style.display = 'none';
@@ -245,10 +270,10 @@
         }
 
         // Check if the selected image is correct
-        function checkAnswer(selectedImage) {
+        function checkAnswer(selectedImage, currentWordIndex) {
             if (!allowClicks) return;
             
-            const correctImage = gameData[currentRound].correctImage;
+            const correctImage = gameData[currentWordIndex].correctImage;
             allowClicks = false;
             
             if (selectedImage === correctImage) {
