@@ -6,30 +6,33 @@
     <title>Word Matching Game</title>
     <style>
         body {
-            font-family: 'Comic Sans MS', cursive, sans-serif;
+            /* Using a more widely available font family with better fallbacks */
+            font-family: 'Nunito', 'Quicksand', 'Arial Rounded MT Bold', 'Avenir', 'Segoe UI', sans-serif;
             background-color: #f0f9ff;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            overflow: hidden;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
         #game-container {
             text-align: center;
             background-color: white;
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 20px;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            width: 80%;
+            width: 90%;
             max-width: 700px;
+            margin: 10px auto;
         }
 
         #word-display {
-            font-size: 3.5rem;
-            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
             color: #2c3e50;
             letter-spacing: 2px;
             transition: all 0.3s;
@@ -37,17 +40,17 @@
 
         #images-container {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             flex-wrap: wrap;
-            margin-top: 20px;
+            gap: 15px;
+            margin-top: 15px;
         }
 
         .image-choice {
             cursor: pointer;
-            margin: 10px;
             transition: transform 0.2s;
-            width: 150px;
-            height: 150px;
+            width: 120px;
+            height: 120px;
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -143,7 +146,49 @@
             80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
             100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
         }
+
+        /* Mobile-specific improvements */
+        @media screen and (max-width: 600px) {
+            #game-container {
+                padding: 1rem;
+                width: 95%;
+            }
+
+            #word-display {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+            }
+
+            .image-choice {
+                width: 100px;
+                height: 100px;
+                margin: 5px;
+            }
+
+            #feedback {
+                font-size: 1.5rem;
+                height: 40px;
+            }
+
+            #sad-face {
+                font-size: 6rem;
+            }
+        }
+
+        /* For very small screens */
+        @media screen and (max-width: 350px) {
+            .image-choice {
+                width: 80px;
+                height: 80px;
+            }
+
+            #word-display {
+                font-size: 1.75rem;
+            }
+        }
     </style>
+    <!-- Preload font to ensure availability -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <div id="game-container">
@@ -257,6 +302,7 @@
                 const img = document.createElement('img');
                 img.src = imageSrc;
                 img.alt = "Choice image";
+                img.loading = "eager"; // Prioritize image loading
                 
                 imageDiv.appendChild(img);
                 imageDiv.addEventListener('click', () => checkAnswer(imageSrc, randomIndex));
@@ -281,7 +327,6 @@
                 celebration.style.display = 'block';
                 createConfetti();
                 feedback.style.visibility = 'visible';
-                nextButton.style.display = 'block';
                 
                 // Highlight the correct choice
                 const images = document.querySelectorAll('.image-choice');
@@ -291,6 +336,12 @@
                         img.style.transform = 'scale(1.1)';
                     }
                 });
+                
+                // Automatically proceed to next word after a delay
+                setTimeout(() => {
+                    currentRound++;
+                    setupRound();
+                }, 2000); // Wait 2 seconds before moving to the next word
             } else {
                 // Wrong answer - show sad animation
                 const clickedImage = Array.from(document.querySelectorAll('.image-choice'))
@@ -306,22 +357,25 @@
                 setTimeout(() => {
                     sadFace.style.display = 'none';
                     clickedImage.classList.remove('incorrect');
-                    currentRound++;
-                    setupRound();
+                    allowClicks = true; // Re-enable clicks but stay on the same word
                 }, 1500);
             }
         }
 
         // Create confetti celebration effect
+        // Create confetti celebration effect
         function createConfetti() {
             celebration.innerHTML = '';
             
             const colors = ['#f44336', '#e91e63', '#9c27b0', '#673ab7', '#3f51b5', 
-                           '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', 
-                           '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
+                        '#2196f3', '#03a9f4', '#00bcd4', '#009688', '#4CAF50', 
+                        '#8BC34A', '#CDDC39', '#FFEB3B', '#FFC107', '#FF9800', '#FF5722'];
             
-            // Create more confetti for a better effect
-            for (let i = 0; i < 200; i++) {
+            // Adjust number of confetti pieces based on device performance
+            const isMobile = window.innerWidth < 600;
+            const confettiCount = isMobile ? 100 : 200;
+            
+            for (let i = 0; i < confettiCount; i++) {
                 const confetti = document.createElement('div');
                 confetti.className = 'confetti';
                 
@@ -330,7 +384,7 @@
                 const delay = Math.random() * 3;
                 const duration = Math.random() * 3 + 3;
                 const color = colors[Math.floor(Math.random() * colors.length)];
-                const size = Math.random() * 10 + 5;
+                const size = Math.random() * (isMobile ? 8 : 10) + 5;
                 
                 confetti.style.left = `${x}%`;
                 confetti.style.top = '-10px';
@@ -364,7 +418,38 @@
             setupRound();
         });
 
+        // Add touch event optimizations
+        document.addEventListener('DOMContentLoaded', () => {
+            // Apply fastclick to remove 300ms delay on mobile touch devices
+            if ('ontouchstart' in window) {
+                document.body.addEventListener('touchstart', function() {}, {passive: true});
+            }
+            
+            // Handle orientation changes
+            window.addEventListener('orientationchange', () => {
+                // Small delay to allow the browser to complete the orientation change
+                setTimeout(() => {
+                    // Adjust any UI elements if needed after orientation change
+                    const viewportHeight = window.innerHeight;
+                    document.documentElement.style.setProperty('--vh', `${viewportHeight * 0.01}px`);
+                }, 200);
+            });
+            
+            // Set initial viewport height custom property for mobile browsers
+            const viewportHeight = window.innerHeight;
+            document.documentElement.style.setProperty('--vh', `${viewportHeight * 0.01}px`);
+        });
+
+        // Preload images for smoother gameplay
+        function preloadImages() {
+            gameData.forEach(item => {
+                const img = new Image();
+                img.src = item.correctImage;
+            });
+        }
+
         // Initialize the game
+        preloadImages();
         setupRound();
     </script>
 </body>
